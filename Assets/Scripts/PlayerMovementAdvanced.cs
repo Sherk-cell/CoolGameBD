@@ -14,7 +14,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
     [SerializeField] public Transform Hookshottransform;
     private float hookshotsize;
 
-
+    float shotrng = 60;
 
     [Header("Movement")]
     private float moveSpeed;
@@ -114,6 +114,9 @@ public class PlayerMovementAdvanced : MonoBehaviour
 
     private void Update()
     {
+
+        
+
         switch (Stats)
         {
             default:
@@ -124,11 +127,13 @@ public class PlayerMovementAdvanced : MonoBehaviour
                 SpeedControl();
                 StateHandler();
                 TextStuff();
+                Debughitpoint.gameObject.SetActive(false);
+
                 break;
 
             case States.hookshotthrown:
                 HandlehookshotThrow();
-
+                Debughitpoint.gameObject.SetActive(true);
 
                 break;
             case States.HookshotFlyingPlayer:
@@ -417,15 +422,33 @@ public class PlayerMovementAdvanced : MonoBehaviour
         {
             IsusingCharController = true;
 
-            if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out RaycastHit raycastHit))
+            if (Physics.Raycast(PlayerCamera.transform.position, PlayerCamera.transform.forward, out RaycastHit raycastHit, shotrng))
             {
-                Debughitpoint.position = raycastHit.point;
-                hookshotPos = raycastHit.point;
 
-                Hookshottransform.gameObject.SetActive(true);
-                Hookshottransform.localScale = Vector3.zero;
-                hookshotsize = 0f;
-                Stats = States.hookshotthrown;
+               
+
+                if (raycastHit.transform.gameObject.tag == "Player")
+                {
+                    Debug.Log("REeh");
+
+                }
+
+                else
+                {
+                    Debug.Log(raycastHit.transform.name);
+                    Debughitpoint.position = raycastHit.point;
+                    hookshotPos = raycastHit.point;
+
+                    Hookshottransform.gameObject.SetActive(true);
+                    Hookshottransform.localScale = Vector3.zero;
+                    hookshotsize = 0f;
+                    Stats = States.hookshotthrown;
+                }
+            }
+
+            else
+            {
+                Debug.Log("Out of range");
             }
 
 
@@ -437,7 +460,7 @@ public class PlayerMovementAdvanced : MonoBehaviour
     {
         Hookshottransform.LookAt(hookshotPos);
 
-        float hookshotthrowspeed = 150;
+        float hookshotthrowspeed = 300;
         hookshotsize += hookshotthrowspeed * Time.deltaTime;
         Hookshottransform.localScale = new Vector3(1, 1, hookshotsize);
 
